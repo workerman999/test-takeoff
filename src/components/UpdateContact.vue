@@ -30,15 +30,16 @@
                                     <v-text-field
                                             label="Email*"
                                             v-model="email"
-                                            :rules="notEmpty"
+                                            :rules="validEmail"
                                             required
                                     ></v-text-field>
                                 </v-col>
                                 <v-col cols="12">
                                     <v-text-field
                                             label="Телефон*"
-                                            :rules="notEmpty"
+                                            :rules="validPhone"
                                             v-model="phone"
+                                            v-mask="maskPhone"
                                             required
                                     ></v-text-field>
                                 </v-col>
@@ -67,16 +68,31 @@
 </template>
 
 <script>
+    import { mask } from 'vue-the-mask'
+
     export default {
+        directives: {
+            mask,
+        },
         name: "UpdateContact",
         data: () => ({
             name: '',
             email: '',
             phone: '',
             valid: true,
+            maskPhone: '+#(###)-###-##-##',
             notEmpty: [
                 v => !!v || 'Поле обязательно к заполнению',
+            ],
+            validPhone: [
+                v => !!v || 'Поле обязательно к заполнению',
+                v => /.{3}-.{3}-.{2}-.{2}/.test(v) || 'Не полный номер телефона',
+            ],
+            validEmail: [
+                v => !!v || 'Поле обязательно к заполнению',
+                v => /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(v) || 'Не корректный email',
             ]
+
         }),
         props: {
             contact: Object,
@@ -101,7 +117,7 @@
                 if (this.$refs.form.validate()) {
                     this.contact.name = this.name;
                     this.contact.email = this.email;
-                    this.contact.phone = this.phone;
+                    this.contact.phone = this.phone.replace(/([-()]+)/g, '');
                     this.$emit('save', this.contact);
                 }
             },
