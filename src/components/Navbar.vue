@@ -16,10 +16,6 @@
 
     export default {
         name: "Navbar",
-        data: () => ({
-            endExamination: false,
-            version: ''
-        }),
         computed: mapGetters(['getUser']),
         methods: {
             ...mapActions(['setAuth']),
